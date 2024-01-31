@@ -1,0 +1,30 @@
+### 목록 조회
+GET http://localhost:19090/memo
+
+### 단건 조회
+GET http://localhost:19090/memo/1
+
+### 생성하기
+POST http://localhost:19090/memo
+Content-Type: application/json
+
+{
+  "title": "제목입니다.",
+  "content": "내용입니다."
+}
+
+### 수정하기(partail)
+PATCH http://localhost:19090/memo/1
+Content-Type: application/json
+
+{
+  "title": "제목입니다.(수정)"
+}
+
+### 수정하기(full)
+PUT http://localhost:19090/memo/1
+Content-Type: application/json
+
+{
+  "title": "제목입니다.(수정)"
+}
