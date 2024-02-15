@@ -4,10 +4,12 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.lang.RuntimeException
+import java.time.LocalDateTime
 
 @Service
 class MemoService(
     private val memoRepository: MemoRepository,
+    private val memoHistoryRepository: MemoHistoryRepository,
 ) {
 
     fun findEntity(memoId: Long): MemoEntity {
@@ -20,9 +22,22 @@ class MemoService(
 
     @Transactional
     fun create(param: MemoCreateParam): MemoEntity {
-        return memoRepository.save(
+
+        val savedResult = memoRepository.save(
             param.makeEntity(MemoStatus.ACTIVE)
         )
+
+        memoHistoryRepository.save(
+            MemoHistoryEntity(
+                memoId = savedResult.id!!,
+                title = savedResult.title,
+                content = savedResult.content,
+                status = savedResult.status,
+                createdAt = LocalDateTime.now()
+            )
+        )
+
+        return savedResult;
     }
 
     /**
@@ -46,6 +61,16 @@ class MemoService(
             entity.updateStatus(it)
         }
 
+        memoHistoryRepository.save(
+            MemoHistoryEntity(
+                memoId = entity.id!!,
+                title = entity.title,
+                content = entity.content,
+                status = entity.status,
+                createdAt = LocalDateTime.now()
+            )
+        )
+
         return entity
     }
 
@@ -63,6 +88,16 @@ class MemoService(
 
         entity.updateStatus(param.status)
 
+        memoHistoryRepository.save(
+            MemoHistoryEntity(
+                memoId = entity.id!!,
+                title = entity.title,
+                content = entity.content,
+                status = entity.status,
+                createdAt = LocalDateTime.now()
+            )
+        )
+
         return entity
     }
 
@@ -72,5 +107,15 @@ class MemoService(
 
         entity.updateStatus(MemoStatus.DELETE)
         //memoRepository.deleteById(memoId)
+
+        memoHistoryRepository.save(
+            MemoHistoryEntity(
+                memoId = entity.id!!,
+                title = entity.title,
+                content = entity.content,
+                status = entity.status,
+                createdAt = LocalDateTime.now()
+            )
+        )
     }
 }
